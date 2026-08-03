@@ -76,15 +76,15 @@ function checkAuth() {
     // 4. LEER TAREAS DESDE MYSQL (GET)
     async function fetchTasks() {
         try {
-            const response = await fetch(`${API_URL}?author=${AUTHOR}`);
+            const response = await fetch(API_URL);
             const json = await response.json();
 
             if (json.status === 'success') {
                 renderTasks(json.data.tasks);
             }
         } catch (error) {
-            console.error('Error de red', error);
-            tasks.Container.innerHTML = '<p class="error">No se pudo conectar con el servidor nativo.</p>';
+            console.error('Error de red:', error);
+            tasksContainer.innerHTML = `<p class="error">No se pudo conectar con el servidor nativo.</p>`;
         }
     }
 
