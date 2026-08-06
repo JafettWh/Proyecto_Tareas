@@ -10,7 +10,7 @@ const pool = mysql.createPool({
     user: 'root',
     password: 'root',
     database: 'todo_db',
-    waitforConnections: true,
+    waitForConnections: true,
     connectionLimit: 10
 });
 
@@ -182,6 +182,6 @@ res.end(JSON.stringify({ status: 'error', message: 'Endpoint no encontrado' }));
 
 const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`Servidor Vanilla con MySQL real corriendo en http://localhost:${PORT}`);
+    console.log(` Servidor Vanilla con MySQL real corriendo en http://localhost:${PORT}`);
 });
 

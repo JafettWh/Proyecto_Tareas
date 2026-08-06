@@ -1,5 +1,5 @@
 // 1. CONFIGURACIÓN GLOBAL (Apunta a tu servidor nativo)
-const API_URL = 'https://localhost:3000/tasks';
+const API_URL = 'http://localhost:3000/tasks';
 
 // Intentamos leer si ya existe un nombre guardado en el disco del navegador
 let AUTHOR = localStorage.getItem('todo_author_session');
@@ -16,7 +16,7 @@ const taskContainer = document.getElementById('tasksContainer');
 const customModal = document.getElementById('customModal');
 const modalTitle = document.getElementById('modalTitle');
 const modalMessage = document.getElementById('ModalMessage');
-const modalCancelBtn = document.getElementById('modalCancelBtn')
+const modalCancelBtn = document.getElementById('modalCancelBtn');
 const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 
 const loginModal = document.getElementById('loginModal');
@@ -79,7 +79,7 @@ function checkAuth() {
             const response = await fetch(API_URL);
             const json = await response.json();
 
-            if (json.status === 'success') {
+            if (json.status === 'success' && json.data.tasks) {
                 renderTasks(json.data.tasks);
             }
         } catch (error) {
