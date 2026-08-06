@@ -6,7 +6,7 @@ const mysql = require('mysql2/promise');
 // 2. CONFIGURACIÓN DE LA CONEXIÓN A MYSQL
 // Creamos un "Pool" de conexiones directas a la base de datos real
 const pool = mysql.createPool({
-    host: 'localhost',
+    host: 'localhost',     // Cambiar por 'db' si corre dentro de la red interna de Docker
     user: 'root',
     password: 'root',
     database: 'todo_db',
@@ -18,12 +18,12 @@ const pool = mysql.createPool({
 const server = http.createServer(async (req,res) => {
 
     // Cabeceras de CORS manuales obligatorias para que el navegador no bloquee el live server
-    res.setHeader('Access-Control-Allow-Origin','*');
-    res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers','Content-Type');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        res.writeHead(200);
+        res.writeHead(204);
         res.end();
         return;
     }
@@ -39,7 +39,7 @@ const server = http.createServer(async (req,res) => {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
                 status: 'success',
-                data: rows
+                data: { tasks: rows }
             }));
         } catch (error) {
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -60,15 +60,15 @@ if (req.url === '/tasks' && req.method === 'POST') {
         try {
             const { title, description, author } = JSON.parse(body);
             
-            if (!title || !description || !author) {
+            if (!title || !author) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'error', message: 'Titulo y autor obligatorios' }));
                 return;
             }
     
             // Consulta SQL con marcadores de posición (?) para pasar los datos de forma limpia
-            const sql = 'INSERT INTO tasks (title, description, author) VALUES (?, ?, ?)';
-            const [result] = await pool.execute(sql, [title, description || null, author]);
+            const sql = 'INSERT INTO tasks (title, description, author, is_completed) VALUES (?, ?, ?, 0)';
+            const [result] = await pool.query(sql, [title, description || null, author]);
 
             // Construimos el objeto de respuesta usando el ID auto-incremental  que generó MySQL
             const newTask = {
@@ -99,7 +99,7 @@ if (req.url.startsWith('/tasks/') && req.method === 'PUT') {
 
     req.on('end', async () => {
         try {
-            const { title, description, author, is_completed } = JSON.parse(body);
+            const { title, description, is_completed, author } = JSON.parse(body);
 
             // 1. Validar si la tarea existe en la base de datos todo_db
             const [rows] = await pool.query('SELECT author FROM tasks WHERE id = ?', [taskId]);
@@ -119,7 +119,7 @@ if (req.url.startsWith('/tasks/') && req.method === 'PUT') {
 
             // 3. Ejecutar la actualización directa con MYSQL usando marcadores
             const sql = 'UPDATE tasks SET title = ?, description = ?, is_completed = ? WHERE id = ?';
-            await pool.execute(sql, [title, description || null, is_completed, taskId]);
+            await pool.query(sql, [title, description || null, is_completed, taskId]);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'success', data: null }));
@@ -158,12 +158,12 @@ if (req.url.startsWith('/tasks/') && req.method === 'DELETE') {
             // Lógica de protección: Comparamos el autor del JSON con el autor de la fila en MYSQL
             if (task.author !== author) {
                 res.writeHead(403, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'error', message: `No autorizado, la tarea pertenece a ${task.author}` }));
+                res.end(JSON.stringify({ status: 'error', message: `No autorizado. la tarea pertenece a ${task.author}` }));
                 return;
             }
 
             // Paso B: Si pasa el filtro, ejecutamos el borrado fisico en la tabla 
-            await pool.execute('DELETE FROM tasks WHERE id = ?', [taskId]);
+            await pool.query('DELETE FROM tasks WHERE id = ?', [taskId]);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'success', data: null }));
@@ -184,4 +184,3 @@ const PORT = 3000;
 server.listen(PORT, () => {
     console.log(` Servidor Vanilla con MySQL real corriendo en http://localhost:${PORT}`);
 });
-

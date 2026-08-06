@@ -7,10 +7,10 @@ let AUTHOR = localStorage.getItem('todo_author_session');
 // 2. CAPTURA CENTRALIZADA DE ELEMENTOS DEL DOM
 const currentUserText = document.getElementById('currentUser');
 const logoutBtn = document.getElementById('logoutBtn');
-const Form = document.getElementById('taskForm');
+const taskForm = document.getElementById('taskForm');
 const taskTitle = document.getElementById('taskTitle');
 const taskDescription = document.getElementById('taskDescription');
-const taskContainer = document.getElementById('tasksContainer');
+const tasksContainer = document.getElementById('tasksContainer');
 
 // 2.1 SELECTORES DE MODALES PERSONALIZADOS
 const customModal = document.getElementById('customModal');
@@ -90,14 +90,14 @@ function checkAuth() {
 
     // 5. PINTAR LAS TARJETAS DINÁMICAMENTE
     function renderTasks(tasks) {
-        taskContainer.innerHTML = '';
+        tasksContainer.innerHTML = '';
 
         if (tasks.length === 0) {
-            taskContainer.innerHTML = '<p class="info">No hay tareas pendientes en la base de datos.</p>';
+            tasksContainer.innerHTML = '<p class="empty">No hay tareas pendientes en la base de datos.</p>';
             return;
         }
 
-        tasks.forEach(task => {
+tasks.forEach(task => {
 const taskCard = document.createElement('div');
 taskCard.className = `task-card ${task.is_completed ? 'completed' : ''}`;
 
