@@ -76,7 +76,7 @@ if (req.url === '/tasks' && req.method === 'POST') {
                 title,
                 description: description || null,
                 author,
-                iscompleted: 0
+                is_completed: 0
             };
 
             res.writeHead(201, { 'Content-Type': 'application/json' });
@@ -118,7 +118,7 @@ if (req.url.startsWith('/tasks/') && req.method === 'PUT') {
             }
 
             // 3. Ejecutar la actualización directa con MYSQL usando marcadores
-            const sql = 'UPDATE tasks SET title = ?, description = ?, iscompleted = ? WHERE id = ?';
+            const sql = 'UPDATE tasks SET title = ?, description = ?, is_completed = ? WHERE id = ?';
             await pool.execute(sql, [title, description || null, is_completed, taskId]);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
