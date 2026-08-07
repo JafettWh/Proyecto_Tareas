@@ -15,7 +15,7 @@ const tasksContainer = document.getElementById('tasksContainer');
 // 2.1 SELECTORES DE MODALES PERSONALIZADOS
 const customModal = document.getElementById('customModal');
 const modalTitle = document.getElementById('modalTitle');
-const modalMessage = document.getElementById('ModalMessage');
+const modalMessage = document.getElementById('modalMessage');
 const modalCancelBtn = document.getElementById('modalCancelBtn');
 const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 
